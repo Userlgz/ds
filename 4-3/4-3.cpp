@@ -1,21 +1,21 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <queue>
-// #include<map>
-// #include<vector>
 using namespace std;
-// map<int, vector<int>> lib;
 typedef struct Book
 {
-    int rent = 0; //租金
+    int rent = 0;    //租金
     int deposit = 0; //押金
-}Book;
+    Book *next;
+} Book;
 
-typedef struct Record
+typedef struct Records
 {
-    int need = 0; //租需要need元 
+    Book head;
+    Book *last;
     int remain = 0; //剩余remain元
-}Record;
+
+} Records;
 
 bool cmp(Book a, Book b)
 {
@@ -28,122 +28,125 @@ bool cmp(Book a, Book b)
 
     return a.rent < b.rent;
 }
-bool cmp2(Book a, Book b)
-{
-    if (b.deposit>(a.deposit+a.rent))
-        return false;
-    else
-    {
-        return true;
-    }
-        
-    if (a.rent == b.rent)
-    {
-        return a.deposit > b.deposit;
-    }
 
-    return a.rent < b.rent;
-}
-
-bool operator > (Book a, Book b)
-{
-    if (b.deposit>=(a.deposit+a.rent))
-        return true;
-        
-    if (a.rent == b.rent)
-    {
-        return a.deposit < b.deposit;
-    }
-
-    return a.rent > b.rent;
-}
-
-// bool cmp1(Record a, Record b)
-// {
-//     if (a.rent == b.rent)
-//     {
-//         return a.deposit > b.deposit;
-//     }
-
-//     return a.rent < b.rent;
-// }
 
 int n, s;
 int a, b;
 int i, j;
 int m = 0;
-int cnt = 0;
+int cnt = 1;
 int num = 0;
+int mon = 0;
 Book books[1000001];
-Book temp[1000001];
+// Book books[20];
+Records records;
 
-priority_queue<Book, vector<Book>, greater<Book> > que1;
-
-// priority_queue<int, pair<int, int>, cmp1> rec;
-
-int	main()
+int main()
 {
     scanf("%d %d", &n, &s);
-    // rec[0][0] = 0;
-    // rec[0][1] = s;
-    for ( i = 0; i < n; i++)
+    for (i = 0; i < n; i++)
     {
         scanf("%d %d", &a, &b);
-        if (a+b<=s)
+        if (a + b <= s)
         {
-            Book book;
-            book.deposit = a;
-            book.rent = b;
-            que1.push(book);
             ++num;
+            books[i].deposit = a;
+            books[i].rent = b;
         }
-        
-        
     }
-
+    if (num == 0)
+    {
+        printf("0");
+        return 0;
+    }
     sort(books, books + num, cmp);
-    sort(books, books + num, cmp2);
-/*
-    for ( i = 0; i < num; i++)
+    // sort(books, books + num, cmp2);
+    
+    records.last = &books[0];
+    records.head.next = &books[0];
+    records.remain = s;
+    s -= books[0].rent;
+
+    for (i = 1; i < num; i++)
     {
         m = books[i].deposit + books[i].rent;
-        if (rec[cnt][1] >= m)
+        if (s >= m)
         {
             ++cnt;
-            rec[cnt][0] = m;
-            rec[cnt][1] = rec[cnt - 1][1] - books[i].rent;
+            records.last->next = &books[i];
+            records.last = &books[i];
+            s -= books[i].rent;
         }
-        else
+        else if (s >= books[i].rent)
         {
-            for ( j = cnt-1; j >= 0; j--)
+            Book *temp = records.head.next;
+            Book *pre = &records.head;
+            mon = records.remain;
+            while (temp != nullptr)
             {
-                if (rec[j][1] >= m && rec[j][1] - books[i].rent >= rec[j + 1][0])
+                if (mon >= m && (mon - books[i].rent) >= (temp->deposit + temp->rent))
                 {
-                    rec[j + 2][0] = rec[j + 1][0];
-                    rec[j + 2][1] = rec[j + 1][1];
-                    rec[j + 1][0] = m;
-                    rec[j + 1][1] = rec[j][1] - books[i].rent;
+                    pre->next = &books[i];
+                    books[i].next = temp;
                     ++cnt;
+                    s -= books[i].rent;
+                    if (mon == m || (mon - books[i].rent) == (temp->deposit + temp->rent))
+                    {
+                        records.head = *pre;
+                        records.remain = mon;
+
+                        // printf("head: %d %d %d\n", pre->deposit, pre->rent, mon);
+                        // printf("----: %d %d %d\n", temp->deposit, temp->rent, mon);
+                    }
                     break;
                 }
+                else
+                {
+                    mon -= temp->rent;
+                    pre = temp;
+                    temp = pre->next;
+                }
             }
-            
         }
-        
     }
-*/
-    printf("\n");
 
-    while(!que1.empty()){
-    	cout << que1.top().deposit << " " << que1.top().rent << endl;
-    	que1.pop();
-    }
-    
-    // for ( i = 0; i < num; i++)
+    // printf("\n----------------------\n");
+    // Book *temp = records.head.next;
+    // while (temp != nullptr)
     // {
-    //     printf("%d %d\n", books[i].deposit, books[i].rent);
+    //     printf("%d %d\n", temp->deposit, temp->rent);
+    //     temp = temp->next;
     // }
+    printf("%d\n", cnt);
 
     // system("pause");
     return 0;
 }
+/*
+
+3 10
+1 2
+3 4
+5 6
+
+8 20
+17 1
+1 1
+1 1
+1 1
+18 2
+16 2
+14 2
+12 2
+
+8 20
+17 1
+1 1
+1 1
+1 1
+18 2
+15 2
+12 2
+10 2
+
+*/

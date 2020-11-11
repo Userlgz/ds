@@ -92,6 +92,6 @@ int main()
 
     // for(i=0;i<4;i++)
     //     cout<<person0[i].a<<" "<<person0[i].b<<endl;
-
+    // system("pause");
     return 0;
 }

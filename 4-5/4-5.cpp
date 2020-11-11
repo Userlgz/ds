@@ -1,20 +1,3 @@
-/*
-3.2	4.2
-4.7	1.5
-2.2	5.0
-5.8	4.0
-3.1	2.8
-*/
-
-/*
-2.2 5.0
-3.2 4.2
-
-5.8 4.0
-3.1 2.8
-4.7 1.5
-
-*/
 #include <iostream>
 #include <algorithm>
 using namespace std;
